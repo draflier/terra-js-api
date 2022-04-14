@@ -51,6 +51,10 @@ export class TerraService {
           {
             await this.transferLunaGas(numGasFee, this.objWallet.key.accAddress);
           }
+        }
+        else
+        {
+          await this.transferLunaGas(numGasFee, this.objWallet.key.accAddress);
         }                        
         await this.transferCW20(strContractAddress, numGasFee, strToAddr);
       }
