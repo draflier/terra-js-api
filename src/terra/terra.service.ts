@@ -39,10 +39,19 @@ export class TerraService {
     {
       let strBal : string = await this.getCW20Balance(strContractAddress);
       Logger.debug("getting "+ strContractAddress +" Balance  => " + strBal);
+      let objCoins : Coins = await this.getNativeBalance();
+      let objLuna : Coin = objCoins.get("uluna");
       if (strBal != "0")
       {
-        Logger.debug("Initiate uLuna Transfer of  => " + strBal);
-        await this.transferLunaGas(numGasFee, this.objWallet.key.accAddress);
+        Logger.debug("Initiate cw20 Transfer of  => " + strBal);
+        if (objLuna != undefined)
+        {
+          let lunaGas : number = objLuna.amount.toNumber();
+          if (lunaGas < numGasFee)
+          {
+            await this.transferLunaGas(numGasFee, this.objWallet.key.accAddress);
+          }
+        }                        
         await this.transferCW20(strContractAddress, numGasFee, strToAddr);
       }
       await sleepMilliSec(this.intSleepTimeMilli);
@@ -300,7 +309,7 @@ export class TerraService {
     //for (let i = 0; i < 9999999; i++)
     while(true)
     {
-      Logger.debug("waiting for sequence change");
+      Logger.debug("waiting for sequence change => " + await this.objWallet.sequence() + "," + (intSequence + 1));
       if (await this.objWallet.sequence() == intSequence + 1)
       {
         return;
